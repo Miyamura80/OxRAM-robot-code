@@ -8,25 +8,24 @@
 
 
 // defines pins numbers for ultrasonic sensors
-const int trigPin = 12;
-const int echoPin = 13;
+const int trigPin = 7;
+const int echoPin = 8;
 
 
 
-//L293D
-//Pins 3,5,6,9,10,11 provide 8 bit PWM output with analogWrite
-// Motor A connections
-const int enA = 9;
-const int in1 = 8;
-const int in2 = 7;
-// Motor B connections
-const int enB = 3;
-const int in3 = 5;
-const int in4 = 4;
-// Shell Motor connections
-const int enS = 6;
-const int in5 = 10;
-const int in6 = 11;
+////L293D
+////Pins 3,5,6,9,10,11 provide 8 bit PWM output with analogWrite
+
+//L293D 1
+const int ShellUP  = 12;  // Pin 14 of L293
+const int ShellDOWN = 13;  // Pin 10 of L293
+
+//L293D 2
+const int LF  = 10; // Pin  7 of L293
+const int LB= 11;  // Pin  2 of L293
+
+const int RF = 9;
+const int RB = 3;
 
 
 const int turniness = 150;
@@ -41,6 +40,8 @@ const int retreatTimeMs2 = 400;
 long duration;
 int distance;
 
+
+int stateU;
 //
 //SETUP 
 //
@@ -50,20 +51,20 @@ pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
 pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
 // Set all the motor control pins to outputs
-  pinMode(enA, OUTPUT);
-  pinMode(enB, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+//  pinMode(enA, OUTPUT);
+//  pinMode(enB, OUTPUT);
+  pinMode(LF, OUTPUT);
+  pinMode(LB, OUTPUT);
+  pinMode(RF, OUTPUT);
+  pinMode(RB, OUTPUT);
   
   // Turn off motors - Initial state
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+  digitalWrite(LF, LOW);
+  digitalWrite(LB, LOW);
+  digitalWrite(RF, LOW);
+  digitalWrite(RB, LOW);
   
-
+  stateU = 0;
   Serial.begin(9600); // Starts the serial communication
 }
 
@@ -74,43 +75,37 @@ pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 //
 void stop(){
     //And this code will stop motors
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, LOW);    
-    digitalWrite(in5, LOW);
-    digitalWrite(in6, LOW);
+    analogWrite(LF, 0);
+    analogWrite(LB, 0);
+    analogWrite(RF, 0);
+    analogWrite(RB, 0);    
+    analogWrite(ShellUP, 0);
+    analogWrite(ShellDOWN, 0);
 
   }
 
 void turnDir(int wheel,int spd,bool dir){
-
     if (wheel==0){
-      analogWrite(enA, spd);
-      if(direction){
-          digitalWrite(in1, HIGH);
-          digitalWrite(in2, LOW);
+//      analogWrite(enA, spd);
+      if(dir){
+          analogWrite(LF, spd);
+          analogWrite(LB, 0);
       } else{
-          digitalWrite(in1, LOW);
-          digitalWrite(in2, HIGH);          
+          analogWrite(LF, 0);
+          analogWrite(LB, spd);          
       }
     
     } else if(wheel==1){
-        analogWrite(enB, spd);
-        if (direction){
+//        analogWrite(enB, spd);
+        if (dir){
         
-          digitalWrite(in3, HIGH);
-          digitalWrite(in4, LOW);
+          analogWrite(RF, spd);
+          analogWrite(RB, 0);
         } else{
-        
-          digitalWrite(in3, LOW);
-          digitalWrite(in4, HIGH);
+          analogWrite(RF, 0);
+          analogWrite(RB, spd);
         }  
-    
-    }
-
-    
-    
+    } 
   }
 
 //angle in degrees cuz easier
@@ -140,17 +135,17 @@ void spin(bool direction=true){
 
 //TODO: Maybe fix the directions the motors spin for going up/down
 void shellDown(bool down){
-  digitalWrite(enS, shellDownSpeed);
+//  analogWrite(enS, shellDownSpeed);
   if(down){
-      digitalWrite(in5, HIGH);
-      digitalWrite(in6, LOW);
+      analogWrite(ShellUP, HIGH);
+      analogWrite(ShellDOWN, LOW);
   } else{
-      digitalWrite(in5, LOW);
-      digitalWrite(in6, HIGH);          
+      analogWrite(ShellUP, LOW);
+      analogWrite(ShellDOWN, HIGH);          
   }
   delay(1000);
-  digitalWrite(in5, LOW);
-  digitalWrite(in6, LOW);          
+  analogWrite(ShellUP, LOW);
+  analogWrite(ShellDOWN, LOW);          
 
 }
 
@@ -175,8 +170,8 @@ float getUltra(){
 
 //TODO: Remove later if redundant
 bool isColliding(){
-  dist = getUltra()
-  if (dist < collideThreshold){
+  float dist = getUltra();
+  if(dist < collideThreshold){
     return true;
   } else{
     return false;
