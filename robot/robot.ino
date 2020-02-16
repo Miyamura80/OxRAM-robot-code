@@ -51,8 +51,8 @@ pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
 pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
 // Set all the motor control pins to outputs
-//  pinMode(enA, OUTPUT);
-//  pinMode(enB, OUTPUT);
+  pinMode(ShellUP, OUTPUT);
+  pinMode(ShellDOWN, OUTPUT);
   pinMode(LF, OUTPUT);
   pinMode(LB, OUTPUT);
   pinMode(RF, OUTPUT);
@@ -137,15 +137,15 @@ void spin(bool direction=true){
 void shellDown(bool down){
 //  analogWrite(enS, shellDownSpeed);
   if(down){
-      analogWrite(ShellUP, HIGH);
-      analogWrite(ShellDOWN, LOW);
+      digitalWrite(ShellUP, HIGH);
+      digitalWrite(ShellDOWN, LOW);
   } else{
-      analogWrite(ShellUP, LOW);
-      analogWrite(ShellDOWN, HIGH);          
+      digitalWrite(ShellUP, LOW);
+      digitalWrite(ShellDOWN, HIGH);          
   }
   delay(1000);
-  analogWrite(ShellUP, LOW);
-  analogWrite(ShellDOWN, LOW);          
+  digitalWrite(ShellUP, LOW);
+  digitalWrite(ShellDOWN, LOW);          
 
 }
 
