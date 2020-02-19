@@ -28,13 +28,13 @@ const int RF = 9;
 const int RB = 3;
 
 
-const int turniness = 2;
+const int turniness = 150;
 const int maxMotSpd = 255;
 const int spinSpeed = 50;
 const int collideThreshold = 50;
 const int shellDownSpeed = 50;
-const int retreatTimeMs = 2000;
-const int retreatTimeMs2 = 2000;
+const int retreatTimeMs = 800;
+const int retreatTimeMs2 = 400;
 
 // defines variables
 long duration;
@@ -117,11 +117,11 @@ void move(int angle,bool direction=true){
     }
     else if (angle <= 0){
       ls = maxMotSpd;
-      rs = maxMotSpd + angle* turniness;
+      rs = maxMotSpd - angle* turniness;
     }
 
-    turnDir(1,(int) ls,direction);
-    turnDir(0,(int) rs,direction);
+    turnDir(0,(int) ls,direction);
+    turnDir(1,(int) rs,direction);
  
     
 }
@@ -136,14 +136,14 @@ void spin(bool direction=true){
 //TODO: Maybe fix the directions the motors spin for going up/down
 void shellDown(bool down){
 //  analogWrite(enS, shellDownSpeed);
-  if(!down){
-      digitalWrite(ShellUP, LOW);
-      digitalWrite(ShellDOWN, HIGH);
-  } else{
+  if(down){
       digitalWrite(ShellUP, HIGH);
-      digitalWrite(ShellDOWN, LOW);          
+      digitalWrite(ShellDOWN, LOW);
+  } else{
+      digitalWrite(ShellUP, LOW);
+      digitalWrite(ShellDOWN, HIGH);          
   }
-  delay(500);
+  delay(1000);
   digitalWrite(ShellUP, LOW);
   digitalWrite(ShellDOWN, LOW);          
 
@@ -209,7 +209,7 @@ int yoink(){
   move(0,false);
   delay(retreatTimeMs);
   move(90);
-  delay(3000);
+  delay(300);
   move(0,false);
   delay(retreatTimeMs2);
   stop();
